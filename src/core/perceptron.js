@@ -1,15 +1,15 @@
 import { stepFunction } from "./activation.js";
 
-export function dotProduct(x) {
+export function dotProduct(x, valueNOut) {
   // Input masuk (nIn)
   let nIn = x.length;
   //   console.info(nIn);
 
   // Next layer 3 Neuron (nilai tersebut berdasarkan keputusanku)
-  let nOut = 3;
+  let nOut = valueNOut;
 
   // Xaviera/Glorot Uniform
-  let xaviera = 6 / (nIn + nOut);
+  let xaviera = Math.sqrt(6 / (nIn + nOut));
   //   console.info(xaviera);
 
   let w = [];
@@ -24,6 +24,9 @@ export function dotProduct(x) {
       neuronInput.push(dataWeight);
     }
     w.push(neuronInput);
+    if (nOut === 1) {
+      return w[0];
+    }
   }
 
   return w;
@@ -33,30 +36,32 @@ export function dotProduct(x) {
   //   console.info(Math.random() * (max - min) + min);
 }
 
-export function perceptronLearning(x, weight) {
+export function perceptronLearning(x, weight, b = 0) {
   // Untuk BIAS awal kita definisikan manual terlebih dahulu
-  let b = 0;
+  let z = 0;
 
-  let z = [];
-
-  //   console.info(x[0]);
-  //   console.info(weight[0][0]);
-  //   console.info(weight.length);
-
-  for (let i = 0; i < x.length; i++) {
-    let result = 0;
-    for (let j = 0; j < weight.length; j++) {
-      let multiplication = x[j] * weight[i][j];
-      result += multiplication;
-    }
-    z.push(result);
+  for (let j = 0; j < weight.length; j++) {
+    let multiplication = x[j] * weight[j];
+    z += multiplication;
   }
 
-  let step = stepFunction(z);
-  return step;
+  z += b;
+
+  return z;
 }
 
-let data = [1, 2, 3];
-let weight = dotProduct(data);
-let perceptron = perceptronLearning(data, weight);
-console.info("ini perception " + perceptron);
+export function aggregatePerceptron(x, weight, b = 0) {
+  const z = perceptronLearning(x, weight, b);
+
+  const prediction = stepFunction(z);
+
+  return prediction;
+}
+
+// let data = [1, 2, 3];
+// let weight = dotProduct(data);
+// let perceptron = perceptronLearning(data, weight);
+// console.info("ini perception " + perceptron);
+
+// let testing = aggregatePerceptron([1, 2, 3]);
+// console.info(testing);
